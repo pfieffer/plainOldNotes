@@ -1,13 +1,14 @@
 package com.example.plainoldnotes;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -28,16 +29,15 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
+    private List<NoteEntity> notesData = new ArrayList<>();
+    private NotesAdapter mAdapter;
+    private MainViewModel mViewModel;
 
     @OnClick(R.id.fab)
-    void fabClickHandler(){
+    void fabClickHandler() {
         Intent intent = new Intent(this, EditorActivity.class);
         startActivity(intent);
     }
-
-    private List<NoteEntity> notesData = new ArrayList<>();
-    private NotesAdapter notesAdapters;
-    private MainViewModel mViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,28 +48,36 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        initViewModel();
         initRecyclerView();
-
-        notesData.addAll(mViewModel.mNotes);
-
-        for (NoteEntity note: notesData){
-            Log.d(TAG, note.toString());
-        }
+        initViewModel();
     }
 
     private void initViewModel() {
+        final Observer<List<NoteEntity>> notesObserver = new Observer<List<NoteEntity>>() {
+            @Override
+            public void onChanged(@Nullable List<NoteEntity> noteEntities) {
+                notesData.clear();
+                notesData.addAll(noteEntities);
+
+                if (mAdapter == null) {
+                    mAdapter = new NotesAdapter(notesData, MainActivity.this);
+                    mRecyclerView.setAdapter(mAdapter);
+                } else {
+                    mAdapter.notifyDataSetChanged();
+                }
+            }
+        };
+
         mViewModel = ViewModelProviders.of(this)
                 .get(MainViewModel.class);
+
+        mViewModel.mNotes.observe(this, notesObserver);
     }
 
     private void initRecyclerView() {
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
-
-        notesAdapters = new NotesAdapter(notesData, this);
-        mRecyclerView.setAdapter(notesAdapters);
     }
 
     @Override
