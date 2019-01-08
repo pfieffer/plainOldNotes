@@ -1,5 +1,6 @@
 package com.example.plainoldnotes;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -16,6 +17,7 @@ import android.view.MenuItem;
 import com.example.plainoldnotes.model.NoteEntity;
 import com.example.plainoldnotes.ui.NotesAdapter;
 import com.example.plainoldnotes.utilities.SampleData;
+import com.example.plainoldnotes.viewModel.MainViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
     private List<NoteEntity> notesData = new ArrayList<>();
     private NotesAdapter notesAdapters;
+    private MainViewModel mViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,13 +52,19 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        initViewModel();
         initRecyclerView();
 
-        notesData.addAll(SampleData.getNotes());
+        notesData.addAll(mViewModel.mNotes);
 
         for (NoteEntity note: notesData){
             Log.d(TAG, note.toString());
         }
+    }
+
+    private void initViewModel() {
+        mViewModel = ViewModelProviders.of(this)
+                .get(MainViewModel.class);
     }
 
     private void initRecyclerView() {
