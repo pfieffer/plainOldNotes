@@ -11,4 +11,4 @@
 
 #### App demo GIF:
 
-![Demo GIF](demo/demo.GIF?raw=true)
+![Demo GIF](demo/demo.gif?raw=true)
