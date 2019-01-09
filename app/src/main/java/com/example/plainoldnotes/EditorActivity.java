@@ -20,6 +20,7 @@ import com.example.plainoldnotes.viewModel.EditorViewModel;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.example.plainoldnotes.utilities.Constants.EDITING_KEY;
 import static com.example.plainoldnotes.utilities.Constants.NOTE_ID_KEY;
 
 public class EditorActivity extends AppCompatActivity {
@@ -28,7 +29,7 @@ public class EditorActivity extends AppCompatActivity {
     EditText mEditText;
 
     private EditorViewModel mViewModel;
-    private boolean mNewNote;
+    private boolean mNewNote, mEditing;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +42,10 @@ public class EditorActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
+        if (savedInstanceState!=null){
+            mEditing = savedInstanceState.getBoolean(EDITING_KEY);
+        }
+
         initViewModel();
     }
 
@@ -51,7 +56,7 @@ public class EditorActivity extends AppCompatActivity {
         mViewModel.mLiveNote.observe(this, new Observer<NoteEntity>() {
             @Override
             public void onChanged(@Nullable NoteEntity noteEntity) {
-                if (noteEntity != null) {
+                if (noteEntity != null && !mEditing) {
                     mEditText.setText(noteEntity.getText());
                 }
             }
@@ -97,5 +102,11 @@ public class EditorActivity extends AppCompatActivity {
     private void saveAndReturn() {
         mViewModel.saveNote(mEditText.getText().toString());
         finish();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean(EDITING_KEY, true);
+        super.onSaveInstanceState(outState);
     }
 }
