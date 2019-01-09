@@ -17,12 +17,15 @@ import com.example.plainoldnotes.viewModel.EditorViewModel;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.example.plainoldnotes.utilities.Constants.NOTE_ID_KEY;
+
 public class EditorActivity extends AppCompatActivity {
 
     @BindView(R.id.et_note_text)
     EditText mEditText;
 
     private EditorViewModel mViewModel;
+    private boolean mNewNote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,5 +52,16 @@ public class EditorActivity extends AppCompatActivity {
                 }
             }
         });
+
+        Bundle extras = getIntent().getExtras();
+        if (extras == null){
+            setTitle("New Note");
+            mNewNote = true;
+        } else {
+            setTitle("Edit Note");
+            int noteId = extras.getInt(NOTE_ID_KEY);
+            mViewModel.loadData(noteId);
+
+        }
     }
 }
