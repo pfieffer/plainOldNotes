@@ -95,4 +95,5 @@
     <string name="delete_all">Delete all notes</string>
     <string name="new_note">New Note</string>
     <string name="edit_note">Edit Note</string>
+    <string name="delete">Delete</string>
 </resources>
